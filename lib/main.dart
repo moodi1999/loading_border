@@ -112,14 +112,14 @@ class MyPainter extends CustomPainter {
       ..strokeWidth = 3.0;
 
     double a = 0;
-    double b = 280;
+    double b = topLeftOffset;
     // a -> b
 
-    double c;
-    double d;
+    double c = b + 15;
+    double d = c + 30;
     // c -> d
 
-    double e;
+    double e = d + 7;
     // e -> a
 
 //    var aPlace = findOffsetPlace(a);
@@ -147,21 +147,60 @@ class MyPainter extends CustomPainter {
           path.lineTo(borderRadius + firstPointOffset, 0);
           break;
         case offsetPlace.topRight:
+          createTopLine();
           tempOffset = endPointOffset - topLineOffset;
           arcToPoint(offsetPlace.topRight, tempOffset);
           break;
         case offsetPlace.rightLine:
+          createTopLine();
+          createTopRightArc();
+          tempOffset = endPointOffset - topRightOffset;
+          path.lineTo(width, borderRadius + tempOffset);
           break;
         case offsetPlace.bottomRight:
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+          tempOffset = endPointOffset - rightLineOffset;
+          arcToPoint(offsetPlace.bottomRight, tempOffset);
           break;
-
         case offsetPlace.bottomLine:
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+          createBottomRightArc();
+          tempOffset = endPointOffset - bottomRightOffset;
+          path.lineTo((width - borderRadius) - tempOffset, height);
           break;
         case offsetPlace.bottomLeft:
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+          createBottomRightArc();
+          createBottomLine();
+          tempOffset = endPointOffset - bottomLineOffset;
+          arcToPoint(offsetPlace.bottomLeft, tempOffset);
           break;
         case offsetPlace.leftLine:
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+          createBottomRightArc();
+          createBottomLine();
+          createBottomLeftArc();
+          tempOffset = endPointOffset - bottomLeftOffset;
+          path.lineTo(0, (height - borderRadius) - tempOffset);
           break;
         case offsetPlace.topLeft:
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+          createBottomRightArc();
+          createBottomLine();
+          createBottomLeftArc();
+          createLeftLine();
+          tempOffset = endPointOffset - leftLineOffset;
+          arcToPoint(offsetPlace.topLeft, tempOffset);
       }
     } else if (firstPointPlace == offsetPlace.topRight) {}
   }
@@ -176,20 +215,27 @@ class MyPainter extends CustomPainter {
     switch (arcPlace) {
       case offsetPlace.topRight:
         tempPi = pi / 2;
+        tempX = width - borderRadius;
+        tempY = -borderRadius;
         break;
       case offsetPlace.bottomRight:
         tempPi = 2 * pi;
-
+        tempX = width - borderRadius;
+        tempY = height - borderRadius;
         break;
       case offsetPlace.bottomLeft:
         tempPi = (3 * pi) / 2;
-
+        tempX = -borderRadius;
+        tempY = height - borderRadius;
         break;
       case offsetPlace.topLeft:
-        tempPi = (pi / 2);
+        tempPi = pi;
+        tempX = -borderRadius;
+        tempY = -borderRadius;
         break;
 
       default:
+        throw arcPlace.toString() + " - > is not an arc";
         break;
     }
 
@@ -202,8 +248,6 @@ class MyPainter extends CustomPainter {
     path.arcToPoint(Offset(x.abs(), y.abs()),
         radius: Radius.circular(borderRadius));
   }
-
-  void drawLine(offsetPlace linePlace) {}
 
   Offset findPointOnArc(radius, angle) {
     return Offset(radius * cos(angle), radius * sin(angle));
@@ -227,6 +271,42 @@ class MyPainter extends CustomPainter {
     } else {
       return offsetPlace.topLeft;
     }
+  }
+
+  void createLeftLine() {
+    path.lineTo(0, borderRadius);
+  }
+
+  void createBottomLeftArc() {
+    path.arcToPoint(Offset(0, height - borderRadius),
+        radius: Radius.circular(borderRadius));
+  }
+
+  void createBottomLine() {
+    path.lineTo(borderRadius, height);
+  }
+
+  void createBottomRightArc() {
+    path.arcToPoint(Offset(width - borderRadius, height),
+        radius: Radius.circular(borderRadius));
+  }
+
+  void createRightLine() {
+    path.lineTo(width, heightLineSize + borderRadius);
+  }
+
+  void createTopRightArc() {
+    path.arcToPoint(Offset(width, borderRadius),
+        radius: Radius.circular(borderRadius));
+  }
+
+  void createTopLine() {
+    path.lineTo(width - borderRadius, 0);
+  }
+
+  void createTopLeftArc() {
+    path.arcToPoint(Offset(borderRadius, 0),
+        radius: Radius.circular(borderRadius));
   }
 
   void createFrame(
