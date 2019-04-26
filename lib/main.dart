@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
   }
 
   Widget loadingBorderWidget2() {
-    return LoadingBorder(width: 250, height: 60, borderRadius: 10, strokeColor: color, strokeWidth: 3.0, animationSpeed: 50);
+    return LoadingBorder(width: 260, height: 50, borderRadius: 10, strokeColor: color, strokeWidth: 3.0, animationSpeed: 10, child: Text("Loading..."),);
   }
 }
 

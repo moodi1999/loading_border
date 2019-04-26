@@ -19,7 +19,8 @@ class LoadingBorder extends StatefulWidget {
       @required this.borderRadius,
       @required this.strokeWidth,
       @required this.strokeColor,
-      @required this.animationSpeed}) {
+      @required this.animationSpeed,
+      @required this.child}) {
     _maxOffset = findMaxOffset();
   }
 
@@ -138,9 +139,9 @@ class LoadingPainter extends CustomPainter {
 
     double firstEmptySize = 20;
 
-    double secondEmptySize = 20;
-    double thirdEmptySize = 20;
-    double lineBetweenLastTwo = 10;
+    double secondEmptySize = 18;
+    double thirdEmptySize = 10;
+    double lineBetweenLastTwo = 14;
 
     path = Path();
     path.moveTo(borderRadius, 0);
