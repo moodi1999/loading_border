@@ -1,49 +1,78 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:loading_border/loading_border.dart';
 
-void main() => runApp(MyApp());
+class LoadingBorder extends StatefulWidget {
+  double width;
+  double height;
+  double borderRadius;
+  double strokeWidth;
+  Color strokeColor;
+  Widget child;
+  int animationSpeed;
 
-class MyApp extends StatelessWidget {
+  double _maxOffset;
+
+  LoadingBorder(
+      {@required this.width,
+      @required this.height,
+      @required this.borderRadius,
+      @required this.strokeWidth,
+      @required this.strokeColor,
+      @required this.animationSpeed}) {
+    _maxOffset = findMaxOffset();
+  }
+
+  double findMaxOffset() {
+    double widthLineOffset = 2 * (width - (2 * borderRadius));
+    double heightLineOffset = 2 * (height - (2 * borderRadius));
+    double arcSizeOffset = 2 * pi * borderRadius;
+    return widthLineOffset + heightLineOffset + arcSizeOffset;
+  }
+
+  @override
+  _LoadingBorderState createState() => _LoadingBorderState();
+}
+
+class _LoadingBorderState extends State<LoadingBorder>
+    with TickerProviderStateMixin<LoadingBorder> {
+  AnimationController controller;
+  Animation<double> animation;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = new AnimationController(
+        vsync: this, duration: Duration(seconds: widget.animationSpeed));
+    animation =
+        new Tween(begin: 0.0, end: widget._maxOffset).animate(controller);
+    controller.repeat();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "paht",
-      home: SafeArea(child: buildScaffold()),
-    );
-  }
-
-  Scaffold buildScaffold() {
-    return Scaffold(
-      appBar: AppBar(),
-      body: buildMainPage(),
-    );
-  }
-
-  Container buildMainPage() {
     return Container(
-      color: Colors.lightGreen,
-      child: Center(
-        child: loadingBorderWidget2(),
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) {
+          return loadingBorderWidget();
+        },
+        child: Container(height: 100, width: 400, color: Colors.black),
       ),
     );
   }
 
   Widget loadingBorderWidget() {
     return Container(
-      width: 300,
-      height: 80,
+      width: widget.width,
+      height: widget.height,
       child: CustomPaint(
-          painter: MyPainter(80, 300, 7),
+          painter: LoadingPainter(animation.value, widget.width, widget.height,
+              widget.borderRadius, widget.strokeWidth, widget.strokeColor),
           child: Center(
-            child: Text("hi"),
+            child: widget.child,
           )),
     );
-  }
-
-  Widget loadingBorderWidget2() {
-    return LoadingBorder(width: 300, height: 80, borderRadius: 7, strokeColor: Colors.blue, strokeWidth: 3.0, animationSpeed: 10);
   }
 }
 
@@ -58,14 +87,18 @@ enum offsetPlace {
   topLeft
 }
 
-class MyPainter extends CustomPainter {
-  double height;
+class LoadingPainter extends CustomPainter {
+  double offset;
   double width;
+  double height;
   double borderRadius;
+  Color strokeColor;
+  double strokeWidth;
+
   double widthLineSize;
   double heightLineSize;
   double arcSize;
-  double fEmptySpaceSize = 15.0;
+  double arcAngles;
 
   double topLineOffset;
   double topRightOffset;
@@ -76,11 +109,10 @@ class MyPainter extends CustomPainter {
   double leftLineOffset;
   double topLeftOffset;
 
-  double arcAngles;
-
   Path path;
 
-  MyPainter(this.height, this.width, this.borderRadius) {
+  LoadingPainter(this.offset, this.width, this.height, this.borderRadius,
+      this.strokeWidth, this.strokeColor) {
     widthLineSize = width - (2 * borderRadius);
     heightLineSize = height - (2 * borderRadius);
     arcSize = (pi * borderRadius) / 2; // 2 * (pi * borderRadius) / 4
@@ -104,46 +136,39 @@ class MyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // rightLineOffset should be equal to maxOffset
 
-    double linesMaxOffs = widthLineSize * 2 + heightLineSize * 2;
-    double arcsMaxOffs = arcSize * 4;
-    double maxOffset = topLeftOffset;
+    double firstEmptySize = 20;
 
+    double secondEmptySize = 20;
+    double thirdEmptySize = 20;
+    double lineBetweenLastTwo = 10;
 
     path = Path();
     path.moveTo(borderRadius, 0);
+
     Paint paint = Paint()
-      ..color = Colors.black
+      ..color = strokeColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
+      ..strokeWidth = strokeWidth;
 
-    double offset = topLeftOffset;
+    double offset = this.offset;
 
-    double a = 20 + offset;
+    double a = firstEmptySize + offset;
     double b = bottomRightOffset + offset;
     // a -> b
 
-    double c = b + 15;
-    double d = c + 10;
-
+    double c = b + secondEmptySize;
+    double d = c + lineBetweenLastTwo;
     // c -> d
 
-    double e = d + 10;
+    double e = d + thirdEmptySize;
     double f = topLeftOffset + offset;
     // e -> a
-
-//    var aPlace = findOffsetPlace(a);
-//    var bPlace = findOffsetPlace(b);
-//    var cPlace = findOffsetPlace(c);
-//    var dPlace = findOffsetPlace(d);
-//    var ePlace = findOffsetPlace(e);
 
     draw(a, b);
     draw(c, d);
     draw(e, f);
-//    draw(f, topLeftOffset - 40);
-//    draw(topLeftOffset - 20, topLeftOffset - 10);
 
-    createFrame(canvas, width, height, borderRadius);
+//    createFrame(canvas, width, height, borderRadius);
     canvas.drawPath(path, paint);
   }
 
@@ -156,8 +181,6 @@ class MyPainter extends CustomPainter {
     }
     var firstPointPlace = findOffsetPlace(firstPointOffset);
     var endPointPlace = findOffsetPlace(endPointOffset);
-    print(firstPointPlace);
-    print(endPointPlace);
 
     var tempOffset;
     if (firstPointPlace == offsetPlace.topLine) {
@@ -291,9 +314,6 @@ class MyPainter extends CustomPainter {
           tempOffset = endPointOffset - topLineOffset;
           arcToPoint(offsetPlace.topRight, tempOffset);
         } else {
-          tempOffset = endPointOffset - topLineOffset;
-          print(tempOffset);
-
           createTopRightArc();
           createRightLine();
           createBottomRightArc();
@@ -304,8 +324,6 @@ class MyPainter extends CustomPainter {
           createTopLine();
 
           tempOffset = endPointOffset - topLineOffset;
-          print(tempOffset);
-
           arcToPoint(offsetPlace.topRight, tempOffset);
         }
 
@@ -855,8 +873,10 @@ class MyPainter extends CustomPainter {
     }
   }
 
-  void arcToPoint(offsetPlace arcPlace,
-      double arcSize,) {
+  void arcToPoint(
+    offsetPlace arcPlace,
+    double arcSize,
+  ) {
     var tempPi;
     var tempX;
     var tempY;
@@ -888,7 +908,7 @@ class MyPainter extends CustomPainter {
     }
 
     var arcPointCor =
-    findPointOnArc(borderRadius, tempPi - (arcSize * arcAngles));
+        findPointOnArc(borderRadius, tempPi - (arcSize * arcAngles));
 
     double x = tempX + arcPointCor.dx.abs();
     double y = tempY + arcPointCor.dy.abs();
@@ -897,8 +917,10 @@ class MyPainter extends CustomPainter {
         radius: Radius.circular(borderRadius));
   }
 
-  void gotToPointOnArc(offsetPlace arcPlace,
-      double arcSize,) {
+  void gotToPointOnArc(
+    offsetPlace arcPlace,
+    double arcSize,
+  ) {
     var tempPi;
     var tempX;
     var tempY;
@@ -930,7 +952,7 @@ class MyPainter extends CustomPainter {
     }
 
     var arcPointCor =
-    findPointOnArc(borderRadius, tempPi - (arcSize * arcAngles));
+        findPointOnArc(borderRadius, tempPi - (arcSize * arcAngles));
 
     double x = tempX + arcPointCor.dx.abs();
     double y = tempY + arcPointCor.dy.abs();
@@ -998,8 +1020,8 @@ class MyPainter extends CustomPainter {
         radius: Radius.circular(borderRadius));
   }
 
-  void createFrame(Canvas canvas, double width, double height,
-      double borderRadius) {
+  void createFrame(
+      Canvas canvas, double width, double height, double borderRadius) {
     Paint paint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
@@ -1011,7 +1033,7 @@ class MyPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(LoadingPainter oldDelegate) {
+    return offset != oldDelegate.offset;
   }
 }
