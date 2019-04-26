@@ -6,6 +6,9 @@ import 'package:loading_border/loading_border.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+
+  Color color = Color(0xFF079C85);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,7 +26,7 @@ class MyApp extends StatelessWidget {
 
   Container buildMainPage() {
     return Container(
-      color: Colors.lightGreen,
+      color: Colors.white,
       child: Center(
         child: loadingBorderWidget2(),
       ),
@@ -43,7 +46,7 @@ class MyApp extends StatelessWidget {
   }
 
   Widget loadingBorderWidget2() {
-    return LoadingBorder(width: 300, height: 80, borderRadius: 7, strokeColor: Colors.blue, strokeWidth: 3.0, animationSpeed: 10);
+    return LoadingBorder(width: 250, height: 60, borderRadius: 10, strokeColor: color, strokeWidth: 3.0, animationSpeed: 50);
   }
 }
 
