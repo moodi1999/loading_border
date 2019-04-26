@@ -104,6 +104,7 @@ class MyPainter extends CustomPainter {
     double arcsMaxOffs = arcSize * 4;
     double maxOffset = topLeftOffset;
 
+
     path = Path();
     path.moveTo(borderRadius, 0);
     Paint paint = Paint()
@@ -111,19 +112,19 @@ class MyPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
 
-    double offset = 100;
+    double offset = 0;
 
-    double a = 0;
-    double b = topLineOffset ;
+    double a = 0 + offset;
+    double b = topLineOffset + offset;
     // a -> b
 
-    double c = b + 10;
-    double d = c + 100;
+    double c = b + 10 + offset;
+    double d = c + 100 + offset;
 
     // c -> d
 
-    double e = d + 10;
-    double f = e + 200;
+    double e = d + 10 + offset;
+    double f = e + 200 + offset;
     // e -> a
 
 //    var aPlace = findOffsetPlace(a);
@@ -135,7 +136,8 @@ class MyPainter extends CustomPainter {
     draw(a, b);
     draw(c, d);
     draw(e, f);
-    draw(f, topLeftOffset - 4);
+    draw(f, topLeftOffset - 40);
+    draw(topLeftOffset - 20, topLeftOffset - 10);
 
     createFrame(canvas, width, height, borderRadius);
     canvas.drawPath(path, paint);
@@ -361,8 +363,23 @@ class MyPainter extends CustomPainter {
       tempOffset, double endPointOffset) {
     switch (endPointPlace) {
       case offsetPlace.rightLine:
-        tempOffset = endPointOffset - topRightOffset;
-        path.lineTo(width, borderRadius + tempOffset);
+        if(firstPointOffset <= endPointOffset){
+          tempOffset = endPointOffset - topRightOffset;
+          path.lineTo(width, borderRadius + tempOffset);
+        }else{
+          createRightLine();
+          createBottomRightArc();
+          createBottomLine();
+          createBottomLeftArc();
+          createLeftLine();
+          createTopLeftArc();
+          createTopLine();
+          createTopRightArc();
+
+          tempOffset = endPointOffset - topRightOffset;
+          path.lineTo(width, borderRadius + tempOffset);
+        }
+
         break;
       case offsetPlace.bottomRight:
         createRightLine();
@@ -426,8 +443,23 @@ class MyPainter extends CustomPainter {
       tempOffset, double endPointOffset) {
     switch (endPointPlace) {
       case offsetPlace.bottomRight:
-        tempOffset = endPointOffset - rightLineOffset;
-        arcToPoint(offsetPlace.bottomRight, tempOffset);
+        if(firstPointOffset <= endPointOffset){
+          tempOffset = endPointOffset - rightLineOffset;
+          arcToPoint(offsetPlace.bottomRight, tempOffset);
+        }else{
+          createBottomRightArc();
+          createBottomLine();
+          createBottomLeftArc();
+          createLeftLine();
+          createTopLeftArc();
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+
+          tempOffset = endPointOffset - rightLineOffset;
+          arcToPoint(offsetPlace.bottomRight, tempOffset);
+        }
+
         break;
       case offsetPlace.bottomLine:
         createBottomRightArc();
@@ -492,8 +524,23 @@ class MyPainter extends CustomPainter {
       tempOffset, double endPointOffset) {
     switch (endPointPlace) {
       case offsetPlace.bottomLine:
-        tempOffset = endPointOffset - bottomRightOffset;
-        path.lineTo((width - borderRadius) - tempOffset, height);
+        if(firstPointOffset <= endPointOffset){
+          tempOffset = endPointOffset - bottomRightOffset;
+          path.lineTo((width - borderRadius) - tempOffset, height);
+        }else{
+          createBottomLine();
+          createBottomLeftArc();
+          createLeftLine();
+          createTopLeftArc();
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+          createBottomRightArc();
+
+          tempOffset = endPointOffset - bottomRightOffset;
+          path.lineTo((width - borderRadius) - tempOffset, height);
+        }
+
         break;
       case offsetPlace.bottomLeft:
         createBottomLine();
@@ -558,8 +605,22 @@ class MyPainter extends CustomPainter {
       tempOffset, double endPointOffset) {
     switch (endPointPlace) {
       case offsetPlace.bottomLeft:
-        tempOffset = endPointOffset - bottomLineOffset;
-        arcToPoint(offsetPlace.bottomLeft, tempOffset);
+        if(firstPointOffset <= endPointOffset){
+          tempOffset = endPointOffset - bottomLineOffset;
+          arcToPoint(offsetPlace.bottomLeft, tempOffset);
+        }else{
+          createBottomLeftArc();
+          createLeftLine();
+          createTopLeftArc();
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+          createBottomRightArc();
+          createBottomLine();
+
+          tempOffset = endPointOffset - bottomLineOffset;
+          arcToPoint(offsetPlace.bottomLeft, tempOffset);
+        }
         break;
       case offsetPlace.leftLine:
         createBottomLeftArc();
@@ -624,8 +685,22 @@ class MyPainter extends CustomPainter {
       tempOffset, double endPointOffset) {
     switch (endPointPlace) {
       case offsetPlace.leftLine:
-        tempOffset = endPointOffset - bottomLeftOffset;
-        path.lineTo(0, (height - borderRadius) - tempOffset);
+        if(firstPointOffset <= endPointOffset){
+          tempOffset = endPointOffset - bottomLeftOffset;
+          path.lineTo(0, (height - borderRadius) - tempOffset);
+        }else{
+          createLeftLine();
+          createTopLeftArc();
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+          createBottomRightArc();
+          createBottomLine();
+          createBottomLeftArc();
+          tempOffset = endPointOffset - bottomLeftOffset;
+          path.lineTo(0, (height - borderRadius) - tempOffset);
+        }
+
         break;
       case offsetPlace.topLeft:
         createLeftLine();
@@ -691,8 +766,23 @@ class MyPainter extends CustomPainter {
       tempOffset, double endPointOffset) {
     switch (endPointPlace) {
       case offsetPlace.topLeft:
-        tempOffset = endPointOffset - leftLineOffset;
-        arcToPoint(offsetPlace.topLeft, tempOffset);
+        if(firstPointOffset <= endPointOffset){
+          tempOffset = endPointOffset - leftLineOffset;
+          arcToPoint(offsetPlace.topLeft, tempOffset);
+        }else{
+          createTopLeftArc();
+          createTopLine();
+          createTopRightArc();
+          createRightLine();
+          createBottomRightArc();
+          createBottomLine();
+          createBottomLeftArc();
+          createLeftLine();
+
+          tempOffset = endPointOffset - leftLineOffset;
+          arcToPoint(offsetPlace.topLeft, tempOffset);
+        }
+
         break;
       case offsetPlace.topLine:
         createTopLeftArc();
