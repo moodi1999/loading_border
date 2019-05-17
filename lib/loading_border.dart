@@ -11,8 +11,6 @@ class LoadingBorder extends StatefulWidget {
   Widget child;
   int animationSpeed;
 
-  double _maxOffset;
-
   LoadingBorder(
       {@required this.width,
       @required this.height,
@@ -20,16 +18,7 @@ class LoadingBorder extends StatefulWidget {
       @required this.strokeWidth,
       @required this.strokeColor,
       @required this.animationSpeed,
-      @required this.child}) {
-    _maxOffset = findMaxOffset();
-  }
-
-  double findMaxOffset() {
-    double widthLineOffset = 2 * (width - (2 * borderRadius));
-    double heightLineOffset = 2 * (height - (2 * borderRadius));
-    double arcSizeOffset = 2 * pi * borderRadius;
-    return widthLineOffset + heightLineOffset + arcSizeOffset;
-  }
+      @required this.child});
 
   @override
   _LoadingBorderState createState() => _LoadingBorderState();
@@ -39,14 +28,22 @@ class _LoadingBorderState extends State<LoadingBorder>
     with TickerProviderStateMixin<LoadingBorder> {
   AnimationController controller;
   Animation<double> animation;
+  double _maxOffset;
+
+  double findMaxOffset() {
+    double widthLineOffset = 2 * (widget.width - (2 * widget.borderRadius));
+    double heightLineOffset = 2 * (widget.height - (2 * widget.borderRadius));
+    double arcSizeOffset = 2 * pi * widget.borderRadius;
+    return widthLineOffset + heightLineOffset + arcSizeOffset;
+  }
 
   @override
   void initState() {
     super.initState();
+    _maxOffset = findMaxOffset();
     controller = new AnimationController(
         vsync: this, duration: Duration(seconds: widget.animationSpeed));
-    animation =
-        new Tween(begin: 0.0, end: widget._maxOffset).animate(controller);
+    animation = new Tween(begin: 0.0, end: _maxOffset).animate(controller);
     controller.repeat();
   }
 
@@ -153,21 +150,47 @@ class LoadingPainter extends CustomPainter {
 
     double offset = this.offset;
 
-    double a = firstEmptySize + offset;
-    double b = bottomRightOffset + offset;
-    // a -> b
 
-    double c = b + secondEmptySize;
-    double d = c + lineBetweenLastTwo;
-    // c -> d
+    /*
+    * you can create a box here with given offsets and draw
+    *
+    * */
 
-    double e = d + thirdEmptySize;
+
+    double a = 10 + firstEmptySize + offset;
+    double b = rightLineOffset + offset;
+
+    double c = bottomRightOffset + offset;
+    double d = bottomLineOffset - widthLineSize/2 - 10 + offset;
+
+    double c1 = bottomLineOffset - widthLineSize/2 + offset;
+    double d1 = bottomLeftOffset  + offset;
+
+    double e = bottomLeftOffset + 20 + offset;
     double f = topLeftOffset + offset;
-    // e -> a
 
     draw(a, b);
     draw(c, d);
+    draw(c1, d1);
     draw(e, f);
+
+
+
+//    double a = firstEmptySize + offset;
+//    double b = bottomRightOffset + offset;
+//    // a -> b
+//
+//    double c = b + secondEmptySize;
+//    double d = c + lineBetweenLastTwo;
+//    // c -> d
+//
+//    double e = d + thirdEmptySize;
+//    double f = topLeftOffset + offset;
+//    // e -> a
+//
+//    draw(a, b);
+//    draw(c, d);
+//    draw(e, f);
 
 //    createFrame(canvas, width, height, borderRadius);
     canvas.drawPath(path, paint);
